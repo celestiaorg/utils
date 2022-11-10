@@ -1,0 +1,53 @@
+name: CI and Release
+on:
+  push:
+    branches:
+      - main
+    # Trigger on version tags
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      version:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: "Semver type of new version (major / minor / patch)"
+        # Input has to be provided for the workflow to run
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  yamllint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: celestiaorg/.github/.github/actions/yamllint@main
+
+  markdown-lint:
+    name: Markdown Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: celestiaorg/.github/.github/actions/markdown-lint@main
+
+  go-ci:
+    uses: ./.github/workflows/go-ci.yml
+
+  # Make a release if this is a manually trigger job, i.e. workflow_dispatch
+  release:
+    needs: [yamllint, markdown-lint, go-ci]
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    permissions: "write-all"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Version Release
+        uses: celestiaorg/.github/.github/actions/version-release@main
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          version-bump: ${{inputs.version}}
