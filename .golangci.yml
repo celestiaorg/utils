@@ -8,38 +8,25 @@ linters:
     - dogsled
     - dupl
     - errcheck
-    # - funlen
-    # - gochecknoglobals
-    # - gochecknoinits
     - goconst
     - gocritic
-    # - gocyclo
-    # - godox
     - gofmt
     - goimports
-    # - golint - deprecated since v1.41. revive will be used instead
     - revive
     - gosec
     - gosimple
     - govet
     - ineffassign
-    # - interfacer
     - lll
     - misspell
-    # - maligned
     - nakedret
     - prealloc
-    # - scopelint - deprecated since v1.39. exportloopref will be used instead
     - exportloopref
     - staticcheck
     - stylecheck
     - typecheck
     - unconvert
-    # - unparam
     - unused
-    # - whitespace
-    # - wsl
-    # - gocognit
     - nolintlint
     - asciicheck
 
@@ -52,6 +39,9 @@ issues:
         - lll
       source: "https://"
   max-same-issues: 50
+  include:
+    - EXC0012 # EXC0012 revive: Annoying issue about not having a comment. The rare codebase has such comments
+    - EXC0014 # EXC0014 revive: Annoying issue about not having a comment. The rare codebase has such comments
 
 linters-settings:
   dogsled:
@@ -66,3 +56,8 @@ linters-settings:
     local-prefixes: github.com/celestiaorg
   dupl:
     threshold: 200
+  revive:
+    rules:
+      - name: exported
+        arguments:
+          - disableStutteringCheck
