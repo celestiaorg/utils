@@ -1,0 +1,6 @@
+*.out
+*.coverprofile
+.DS_Store
+.idea/
+.vscode/
+coverage.txt

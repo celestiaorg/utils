@@ -1,0 +1,99 @@
+name: CI and Release
+on:
+  push:
+    branches:
+      - main
+    # Trigger on version tags
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      version:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: "Semver type of new version (major / minor / patch)"
+        # Input has to be provided for the workflow to run
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+env:
+  GO_VERSION: 1.19
+
+jobs:
+  yamllint:
+    name: Yaml Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: celestiaorg/.github/.github/actions/yamllint@main
+
+  markdown-lint:
+    name: Markdown Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: celestiaorg/.github/.github/actions/markdown-lint@main
+
+  go-lint:
+    name: Go Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Run go mod tidy
+        run: go mod tidy
+      - name: Check for go mod diff
+        run: git diff --exit-code
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3.2.0
+        with:
+          version: v1.49.0
+
+  tests:
+    needs: go-lint
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Run Test
+        run: make test
+
+  coverage:
+    needs: tests
+    name: Tests Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: Test & Coverage
+        run: make cover
+      - uses: codecov/codecov-action@v3.1.1
+        with:
+          file: ./coverage.txt
+
+  # Make a release if this is a manually trigger job, i.e. workflow_dispatch
+  release:
+    needs: [yamllint, markdown-lint, tests]
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    permissions: "write-all"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Version Release
+        uses: celestiaorg/.github/.github/actions/version-release@main
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          version-bump: ${{inputs.version}}
