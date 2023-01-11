@@ -8,8 +8,6 @@ import (
 const seed = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
 
 // RandString generates a random string of any length
-// and returns an error if an issue
-// was encountered while doing so.
 // This function relies on crypto/rand and thus is secure.
 func RandString(n int) (string, error) {
 	bz := make([]byte, n)
