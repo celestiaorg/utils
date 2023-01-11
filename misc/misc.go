@@ -12,15 +12,16 @@ const seed = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
 // was encountered while doing so.
 // This function relies on crypto/rand and thus is secure.
 func RandString(n int) (string, error) {
-	seedlen := int64(len(seed))
-	randstr := make([]byte, n)
-	for i := 0; i < n; i++ {
-		num, err := rand.Int(rand.Reader, big.NewInt(seedlen))
-		if err != nil {
-			return "", err
-		}
-		randstr[i] = seed[num.Int64()]
+	bz := make([]byte, n)
+	_, err := rand.Read(bz)
+	if err != nil {
+		return "", err
 	}
 
-	return string(randstr), nil
+	const l = byte(len(seed))
+	for i, b := range bz {
+		bz[i] = seed[b%l]
+	}
+
+	return string(bz), nil
 }
