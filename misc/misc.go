@@ -2,10 +2,9 @@ package misc
 
 import (
 	"crypto/rand"
-	"math/big"
 )
 
-const seed = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
+const Charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"
 
 // RandString generates a random string of any length
 // This function relies on crypto/rand and thus is secure.
@@ -16,9 +15,9 @@ func RandString(n int) (string, error) {
 		return "", err
 	}
 
-	const l = byte(len(seed))
+	const l = byte(len(Charset))
 	for i, b := range bz {
-		bz[i] = seed[b%l]
+		bz[i] = Charset[b%l]
 	}
 
 	return string(bz), nil
