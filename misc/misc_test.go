@@ -23,7 +23,16 @@ func TestRandString(t *testing.T) {
 
 		re := regexp.MustCompile(fmt.Sprintf("^[%s]+$", Charset))
 
-		assert.True(t, re.MatchString(randStr1), "the random string should not contain any characters outside the allowed charset")
-		assert.True(t, re.MatchString(randStr2), "the random string should not contain any characters outside the allowed charset")
+		assert.True(
+			t,
+			re.MatchString(randStr1),
+			"the random string should not contain any characters outside the allowed charset",
+		)
+
+		assert.True(
+			t,
+			re.MatchString(randStr2),
+			"the random string should not contain any characters outside the allowed charset",
+		)
 	}
 }
