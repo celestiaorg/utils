@@ -28,7 +28,6 @@ func TestRandString(t *testing.T) {
 			re.MatchString(randStr1),
 			"the random string should not contain any characters outside the allowed charset",
 		)
-
 		assert.True(
 			t,
 			re.MatchString(randStr2),
