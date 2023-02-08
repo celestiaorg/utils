@@ -1,4 +1,4 @@
-module utils
+module github.com/celestiaorg/utils
 
 go 1.19
 
