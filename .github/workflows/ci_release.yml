@@ -51,7 +51,7 @@ jobs:
       - name: Check for go mod diff
         run: git diff --exit-code
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v5.3.0
+        uses: golangci/golangci-lint-action@v6.0.1
         with:
           version: v1.49.0
 
